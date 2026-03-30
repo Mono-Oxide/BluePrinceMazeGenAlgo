@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq.Expressions;
+using System.Runtime;
 
 public class Program
 {
@@ -58,11 +59,15 @@ public class MainAlgorithm
         Wall[][] options = pathway.Poll();
         
         // choose one of the pathway types
-
+        Wall[] pathwayType = ca.Choose(options);
 
         // R O T A T E pathway type
+        pathwayType = pathway.Rotate(pathwayType, (int)dir);
+        
 
         // place in node
+        maze[tarX, tarY].walls = pathwayType;
+        maze[tarX, tarY].visited = true;
         // loop end
 
         // go to random unvisited location near walls next to a visited cell 
