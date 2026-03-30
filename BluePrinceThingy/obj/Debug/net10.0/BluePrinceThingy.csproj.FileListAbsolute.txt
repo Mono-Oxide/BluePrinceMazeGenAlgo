@@ -1,0 +1,14 @@
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\bin\Debug\net10.0\BluePrinceThingy.exe
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\bin\Debug\net10.0\BluePrinceThingy.deps.json
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\bin\Debug\net10.0\BluePrinceThingy.runtimeconfig.json
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\bin\Debug\net10.0\BluePrinceThingy.dll
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\bin\Debug\net10.0\BluePrinceThingy.pdb
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\Debug\net10.0\BluePrinceThingy.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\Debug\net10.0\BluePrinceThingy.AssemblyInfoInputs.cache
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\Debug\net10.0\BluePrinceThingy.AssemblyInfo.cs
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\Debug\net10.0\BluePrinceThingy.csproj.CoreCompileInputs.cache
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\Debug\net10.0\BluePrinceThingy.dll
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\Debug\net10.0\refint\BluePrinceThingy.dll
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\Debug\net10.0\BluePrinceThingy.pdb
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\Debug\net10.0\BluePrinceThingy.genruntimeconfig.cache
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\Debug\net10.0\ref\BluePrinceThingy.dll
