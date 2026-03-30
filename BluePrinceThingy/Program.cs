@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq.Expressions;
 
 public class Program
@@ -24,19 +25,40 @@ public class Maze
 
 public class MainAlgorithm
 {
-    public Maze maze;
+    public Node[,] maze;
 
-    public void Execute()
+    public void Execute(int size)
     {
+        Random rng = new Random();
+        Pathway pathway = new Pathway();
+        PathAlgorithm pa = new PathAlgorithm(size);
+        ChooseAlgorithm ca = new ChooseAlgorithm(); 
+
+        int[] modifier = new int[8] {1, 0, 0, 1, -1, 0, 0, -1};
+
+        maze = new Node[size, size];
+        int curX = 0;
+        int curY = 0;
+        int tarX = 0;
+        int tarY = 0;
+
         // go to random location on grid
+
+        curX = rng.Next(size);
+        curY = rng.Next(size);
 
         // loop start
         // loop start
         // pick direction
+        Direction dir = pa.pathFind();
+        tarX = curX + modifier[2 * (int)dir];
+        tarY = curY + modifier[2 * (int)dir + 1];
 
         // get pathway options (poll)
-
+        Wall[][] options = pathway.Poll();
+        
         // choose one of the pathway types
+
 
         // R O T A T E pathway type
 
@@ -52,19 +74,71 @@ public class MainAlgorithm
 }
 
 
+
+public class PathAlgorithm
+{
+    int size;
+    public PathAlgorithm(int size_)
+    {
+        size = size_;
+    }
+
+    public Direction pathFind() 
+    {
+        Random rng = new Random();
+        return (Direction)rng.Next(4);
+    }
+}
+
+public enum Direction
+{
+    Up,
+    Right,
+    Down,
+    Left
+};
+
+public class ChooseAlgorithm
+{
+    public Wall[] Choose(Wall[][] options) 
+    {
+        return options[0];
+    }
+}
+
+
+
 public class Node
 {
     public Wall[] walls;
+    public bool visited = false;
 
-    public override string ToString()
+    public (string, string, string) Stringer()
     {
-        string s = "";
+        (string, string, string) res = ("", "", "");
         switch (walls)
         {
-            case [Wall.North]: s = ""; break;
+            case [Wall.North]: res = ("###", "   ", "# #"); break;
+            case [Wall.East]: res = ("# #", "  #", "# #"); break;
+            case [Wall.South]: res = ("# #", "   ", "# #"); break;
+            case [Wall.West]: res = ("# #", "#  ", "# #"); break;
+
+            case [Wall.North, Wall.East]: res = ("###", "  #", "# #"); break;
+            case [Wall.North, Wall.South]: res = ("###", "   ", "###"); break;
+            case [Wall.North, Wall.West]: res = ("###", "#  ", "###"); break;
+            case [Wall.East, Wall.South]: res = ("# #", "  #", "###"); break;
+            case [Wall.East, Wall.West]: res = ("# #", "# #", "# #"); break;
+            case [Wall.South, Wall.West]: res = ("# #", "#  ", "###"); break;
+
+            case [Wall.North, Wall.East, Wall.South]: res = ("###", "  #", "###"); break;
+            case [Wall.East, Wall.South, Wall.West]: res = ("# #", "# #", "###"); break;
+            case [Wall.South, Wall.West, Wall.North]: res = ("###", "#  ", "###"); break;
+            case [Wall.West, Wall.North, Wall.East]: res = ("###", "# #", "# #"); break;
+
+            default: res = ("# #", "   ", "# #"); break;
         }
 
-        return s;
+        return res;
     }
 }
 
@@ -128,13 +202,19 @@ public class Visualizer
         Node[,] grid2 = maze.grid;
         for (int x = 0; x < grid2.GetLength(0); x++)
         {
-            string s = "";
+            string row1 = "";
+            string row2 = "";
+            string row3 = "";
             for (int y = 0; y < grid2.GetLength(1); y++)
             {
-                s += grid2[x, y].ToString();   
+                (string, string, string) s = grid2[x, y].Stringer();
+                row1 += s.Item1;
+                row2 += s.Item2;
+                row3 += s.Item3;   
             }
-            Console.WriteLine(s);
+            Console.WriteLine(row1);
+            Console.WriteLine(row2);
+            Console.WriteLine(row3);
         }
-
     }    
 }
