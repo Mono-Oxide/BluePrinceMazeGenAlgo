@@ -5,8 +5,6 @@ using System.Drawing;
 using System.Linq.Expressions;
 using System.Linq;
 using System.Runtime;
-using System.Security.Cryptography.X509Certificates;
-
 public class Program
 {
     public static void Main()
@@ -72,12 +70,15 @@ public class MainAlgorithm
                 tarX = res.Item1.x;
                 tarY = res.Item1.y;
                 Direction dir = res.Item2;
+                Console.WriteLine(dir);
 
                 // get pathway options (poll)
-                Wall[][] options = pathway.Poll(tarX, tarY, size);
+                Wall[][] options = pathway.Poll(curX, curY, size, (Wall)dir);
         
                 // choose one of the pathway types
                 Wall[] pathwayType = ca.Choose(options);
+                foreach (Wall w in pathwayType) Console.Write($"{w} ");
+                Console.WriteLine();
 
                 // R O T A T E pathway type
                 pathwayType = pathway.Rotate(pathwayType, (int)dir);
@@ -93,19 +94,41 @@ public class MainAlgorithm
                 curY = tarY;
 
                 // generate new nodes
+                // for (int i = 0; i < 4; i++)
+                // {
+                //     int posNewX = tarX + modifier[2*i];
+                //     int posNewY = tarY + modifier[2*i + 1];
+                //     if (!(posNewX < 0 || posNewX >= size || posNewY < 0 || posNewY >= size))
+                //     {
+                //         if (!maze[posNewX, posNewY].visited && !maze[tarX, tarY].walls.Contains((Wall)i))//!movementOptions.Contains(maze[posNewX, posNewY]) && !maze[posNewX, posNewY]) 
+                //         {
+                //             movementOptions.Add(new Node(posNewX, posNewY, target));
+                //         }   
+                //     }
+                // }
+
                 for (int i = 0; i < 4; i++)
-                {
-                    int posNewX = tarX + modifier[2*i];
-                    int posNewY = tarY + modifier[2*i + 1];
-                    if (!(posNewX < 0 || posNewX >= size || posNewY < 0 || posNewY >= size))
-                    {
-                        if (!maze[posNewX, posNewY].visited)//!movementOptions.Contains(maze[posNewX, posNewY]) && !maze[posNewX, posNewY]) 
-                        {
-                            movementOptions.Add(new Node(posNewX, posNewY, target));
-                        }   
-                    }
-                }
-            
+{
+    int posNewX = tarX + modifier[2*i];
+    int posNewY = tarY + modifier[2*i + 1];
+
+    if (posNewX < 0 || posNewX >= size || posNewY < 0 || posNewY >= size)
+        continue;
+
+    // 🚫 NEW: block if there's a wall in that direction
+    if (maze[tarX, tarY].walls != null &&
+        maze[tarX, tarY].walls.Contains((Wall)i))
+        continue;
+
+    if (!maze[posNewX, posNewY].visited)
+    {
+        movementOptions.Add(new Node(posNewX, posNewY, target));
+    }
+}
+            Visualizer v = new Visualizer();
+
+            v.Show(maze);
+
             // loop end
             }
 
@@ -175,12 +198,12 @@ public class PathAlgorithm
         Node prev = next.prev;
         if (prev.x - next.x == 0)
         {
-            if (prev.y - next.y < 0) dir = 0; // UP
-            else dir = 2;                     // DOWN
+            if (prev.y - next.y < 0) dir = 2; // DOWN
+            else dir = 0;                     // UP
         } else
         {
-            if (prev.x - next.x < 0) dir = 1; // RIGHT
-            else dir = 3;                     // LEFT
+            if (prev.x - next.x < 0) dir = 1; // LEFT
+            else dir = 3;                     // RIGHT
         }
 
         while (tarX < 0 || tarX >= size || tarY < 0 || tarY >= size)
@@ -237,11 +260,22 @@ public class Node
             case [Wall.South]: res = ("┌ ┐", "   ", "└─┘"); break;
             case [Wall.West]: res = ("┌ ┐", "│  ", "└ ┘"); break;
 
+            case [Wall.East, Wall.North]: res = ("┌─┐", "  │", "└ ┘"); break;
             case [Wall.North, Wall.East]: res = ("┌─┐", "  │", "└ ┘"); break;
+
+            case [Wall.South, Wall.North]: res = ("┌─┐", "   ", "└─┘"); break;
             case [Wall.North, Wall.South]: res = ("┌─┐", "   ", "└─┘"); break;
-            case [Wall.North, Wall.West]: res = ("┌─┐", "│  ", "└─┘"); break;
+
+            case [Wall.West, Wall.North]: res = ("┌─┐", "│  ", "└ ┘"); break;
+            case [Wall.North, Wall.West]: res = ("┌─┐", "│  ", "└ ┘"); break;
+
+            case [Wall.South, Wall.East]: res = ("┌ ┐", "  │", "└─┘"); break;
             case [Wall.East, Wall.South]: res = ("┌ ┐", "  │", "└─┘"); break;
+
+            case [Wall.West, Wall.East]: res = ("┌ ┐", "│ │", "└ ┘"); break;
             case [Wall.East, Wall.West]: res = ("┌ ┐", "│ │", "└ ┘"); break;
+
+            case [Wall.West, Wall.South]: res = ("┌ ┐", "│  ", "└─┘"); break;
             case [Wall.South, Wall.West]: res = ("┌ ┐", "│  ", "└─┘"); break;
 
             case [Wall.North, Wall.East, Wall.South]: res = ("┌─┐", "  │", "└─┘"); break;
@@ -268,7 +302,7 @@ public class Pathway {
 
     public Dictionary<string, Wall[]> pathwayTypes = new Dictionary<string, Wall[]>
     {
-        {"dead end", [Wall.North, Wall.East, Wall.South]},
+        {"dead end", [Wall.North, Wall.East, Wall.West]},
         {"4-way", []},
         {"straight", [Wall.East, Wall.West]},
         {"turn-L", [Wall.North, Wall.East]},
@@ -280,7 +314,7 @@ public class Pathway {
 
     public Wall[][] pathwayTypes2 = new Wall[8][]
     {
-        new Wall[3] {Wall.North, Wall.East, Wall.South},
+        new Wall[3] {Wall.West, Wall.North, Wall.East},
         new Wall[0] {},
         new Wall[2] {Wall.East, Wall.West},
         new Wall[2] {Wall.North, Wall.East},
@@ -292,7 +326,7 @@ public class Pathway {
 
     public Wall[][] pathwayTypes3 = new Wall[7][]
     {
-        new Wall[3] {Wall.North, Wall.East, Wall.South},
+        new Wall[3] {Wall.West, Wall.North, Wall.East},
         new Wall[2] {Wall.East, Wall.West},
         new Wall[2] {Wall.North, Wall.East},
         new Wall[2] {Wall.North, Wall.West},
@@ -303,7 +337,7 @@ public class Pathway {
 
     public Wall[][] pathwayTypes4 = new Wall[3][]
     {
-        new Wall[3] {Wall.North, Wall.East, Wall.South},
+        new Wall[3] {Wall.West, Wall.North, Wall.East},
         new Wall[2] {Wall.North, Wall.East},
         new Wall[2] {Wall.North, Wall.West},
     };
@@ -311,6 +345,7 @@ public class Pathway {
     public Wall[] Rotate(Wall[] original, int turnAmount)
     {
         Wall[] result = new Wall[original.Length];
+        int x = 2;
         for (int i = 0; i < original.Length; i++)
         {
             result[i] = (Wall)(((int)original[i] + turnAmount) % 4);
@@ -318,14 +353,21 @@ public class Pathway {
         return result;
     }
 
-    public Wall[][] Poll(int x, int y, int size)
+    public Wall[][] Poll(int x, int y, int size, Wall dir)
     {
         Random rng = new Random();
         Wall[][] result = new Wall[3][];
-        if ((x == 0 || x == size - 1) && (y == 0 || y == size - 1)) 
-            result = rng.GetItems<Wall[]>(pathwayTypes4, 3);
-        else if ((x == 0 || x == size - 1) || (y == 0 || y == size - 1)) result = rng.GetItems<Wall[]>(pathwayTypes3, 3);
-        else result = rng.GetItems<Wall[]>(pathwayTypes2, 3);
+        List<Wall[]> cellKnowledge = new List<Wall[]>();
+        if ((x == 0 || x == size - 1) && (y == 0 || y == size - 1)) cellKnowledge = pathwayTypes4.ToList<Wall[]>();
+        else if ((x == 0 || x == size - 1) || (y == 0 || y == size - 1)) cellKnowledge = pathwayTypes3.ToList<Wall[]>();
+        else cellKnowledge = pathwayTypes2.ToList<Wall[]>();
+
+        for (int i = 0; i < 0; i++)
+        {
+            if (cellKnowledge[i].Contains(dir)) cellKnowledge.RemoveAt(i); 
+        }
+
+        result = rng.GetItems<Wall[]>(cellKnowledge.ToArray<Wall[]>(), 3);
         return result;
     }
 }
@@ -335,12 +377,12 @@ public class Visualizer
     public void Show(Node[,] maze)
     {
         Node[,] grid2 = maze;
-        for (int x = 0; x < grid2.GetLength(0); x++)
+        for (int y = 0; y < grid2.GetLength(1); y++)
         {
             string row1 = "";
             string row2 = "";
             string row3 = "";
-            for (int y = 0; y < grid2.GetLength(1); y++)
+            for (int x = 0; x < grid2.GetLength(0); x++)
             {
                 if (grid2[x, y] != null) {
                 (string, string, string) s = grid2[x, y].Stringer();
