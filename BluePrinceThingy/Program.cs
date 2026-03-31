@@ -99,6 +99,39 @@ public class PathAlgorithm
 
         return (tarX, tarY, (Direction)dir);
     }
+
+    public HashSet<Node> bfs(Node[,] maze, Node toExpand)
+    {
+        List<Point> toExpNew = new List<Point>();
+        HashSet<Node> unfilled = new HashSet<Node>();
+        for(int i = 0; i++ < 4; i++)
+        {
+            if(!toExpand.walls.Contains((Wall)i))
+                toExpNew.Add(move(new Point(), i));
+        }
+        foreach(Point to in toExpNew)
+        {
+            if (to != originPoint)
+            {
+                Node node = maze[to.X, to.Y];
+                if(node.visited)
+                    unfilled.UnionWith(bfs(maze, toExpand));
+                else
+                    unfilled.Add(node);
+            }
+        }
+        return unfilled;
+    }
+    private Point move(Point start, int dir)
+    {
+        switch (dir)
+        {
+            case 0:  return (new Point (start.X, start.Y + 1));
+            case 1:  return (new Point (start.X + 1, start.Y));
+            case 2:  return (new Point (start.X, start.Y - 1));
+            default: return (new Point (start.X - 1, start.Y));
+        };
+    }
 }
 
 public enum Direction
