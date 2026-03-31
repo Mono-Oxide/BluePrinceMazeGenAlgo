@@ -200,15 +200,15 @@ public class PathAlgorithm
         for(int i = 0; i++ < 4; i++)
         {
             if(!toExpand.walls.Contains((Wall)i))
-                toExpNew.Add(move(new Point(), i));
+                toExpNew.Add(move(new Point(toExpand.x, toExpand.y), i));
         }
         foreach(Point to in toExpNew)
         {
-            if (to != originPoint)
+            Node node = maze[to.X, to.Y];
+            if (node != toExpand.prev)
             {
-                Node node = maze[to.X, to.Y];
                 if(node.visited)
-                    unfilled.UnionWith(bfs(maze, toExpand));
+                    unfilled.UnionWith(bfs(maze, node));
                 else
                     unfilled.Add(node);
             }
