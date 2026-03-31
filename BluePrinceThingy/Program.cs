@@ -12,15 +12,9 @@ public class Program
         Visualizer vis = new Visualizer();
         MainAlgorithm ma = new MainAlgorithm();
         Console.Write("Starting now");
-        ma.Execute();
+        ma.Execute(20);
         vis.Show(ma.maze);
     }
-}
-
-public class Maze
-{
-    public int size;
-    public Node[,] grid;
 }
 
 
@@ -34,8 +28,6 @@ public class MainAlgorithm
         Pathway pathway = new Pathway();
         PathAlgorithm pa = new PathAlgorithm(size);
         ChooseAlgorithm ca = new ChooseAlgorithm(); 
-
-        int[] modifier = new int[8] {1, 0, 0, 1, -1, 0, 0, -1};
 
         maze = new Node[size, size];
         int curX = 0;
@@ -51,9 +43,10 @@ public class MainAlgorithm
         // loop start
         // loop start
         // pick direction
-        Direction dir = pa.pathFind();
-        tarX = curX + modifier[2 * (int)dir];
-        tarY = curY + modifier[2 * (int)dir + 1];
+        (int, int, Direction) res = pa.pathFind(curX, curY);
+        tarX = res.Item1;
+        tarY = res.Item2;
+        Direction dir = (Direction)res.Item3;
 
         // get pathway options (poll)
         Wall[][] options = pathway.Poll();
@@ -83,15 +76,28 @@ public class MainAlgorithm
 public class PathAlgorithm
 {
     int size;
+    int[] modifier = new int[8] {1, 0, 0, 1, -1, 0, 0, -1};
+
     public PathAlgorithm(int size_)
     {
         size = size_;
     }
 
-    public Direction pathFind() 
+    public (int, int, Direction) pathFind(int curX, int curY) 
     {
         Random rng = new Random();
-        return (Direction)rng.Next(4);
+        int dir = rng.Next(4);
+        int tarX = curX + modifier[2 * dir];
+        int tarY = curY + modifier[2 * dir + 1];
+
+        while (tarX < 0 || tarX >= size || tarY < 0 || tarY >= size)
+        {
+            dir = rng.Next(4);
+            tarX = curX + modifier[2 * dir];
+            tarY = curY + modifier[2 * dir + 1];
+        }
+
+        return (tarX, tarY, (Direction)dir);
     }
 }
 
@@ -202,9 +208,9 @@ public class Pathway {
 
 public class Visualizer
 {
-    public void Show(Maze maze)
+    public void Show(Node[,] maze)
     {
-        Node[,] grid2 = maze.grid;
+        Node[,] grid2 = maze;
         for (int x = 0; x < grid2.GetLength(0); x++)
         {
             string row1 = "";
