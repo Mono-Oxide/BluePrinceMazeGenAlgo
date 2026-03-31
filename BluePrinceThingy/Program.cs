@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq.Expressions;
+using System.Linq;
 using System.Runtime;
 
 public class Program
@@ -21,13 +22,17 @@ public class Program
 public class MainAlgorithm
 {
     public Node[,] maze;
+    public bool[,] visitedGrid;
 
     public void Execute(int size)
     {
         Random rng = new Random();
         Pathway pathway = new Pathway();
         PathAlgorithm pa = new PathAlgorithm(size);
-        ChooseAlgorithm ca = new ChooseAlgorithm(); 
+        ChooseAlgorithm ca = new ChooseAlgorithm();
+        HashSet<Node> movementOptions = new HashSet<Node>(); 
+
+        int[] modifier = new int[8] {1, 0, 0, 1, -1, 0, 0, -1};
 
         maze = new Node[size, size];
         int curX = 0;
@@ -39,35 +44,68 @@ public class MainAlgorithm
 
         curX = rng.Next(size);
         curY = rng.Next(size);
+        movementOptions.Add(new Node(curX, curY, null));
+
+        bool allVisited = visitedGrid.Cast<bool>().All(x => x == true);
 
         // loop start
-        // loop start
-        // pick direction
-        (int, int, Direction) res = pa.pathFind(curX, curY);
-        tarX = res.Item1;
-        tarY = res.Item2;
-        Direction dir = (Direction)res.Item3;
-
-        // get pathway options (poll)
-        Wall[][] options = pathway.Poll();
+        while (allVisited) {
         
-        // choose one of the pathway types
-        Wall[] pathwayType = ca.Choose(options);
+            // loop start
+            while (movementOptions.Count > 0) {
+                // pick direction
+                (Node, Direction) res = pa.pathFind(curX, curY, movementOptions.ToList<Node>()); // random walk
+                movementOptions.Remove(res.Item1);
+                // (int, int, Direction) res = pa.pathFind(curX, curY); // bfs
 
-        // R O T A T E pathway type
-        pathwayType = pathway.Rotate(pathwayType, (int)dir);
+                tarX = res.Item1.x;
+                tarY = res.Item1.y;
+                Direction dir = res.Item2;
+
+                // get pathway options (poll)
+                Wall[][] options = pathway.Poll();
         
+                // choose one of the pathway types
+                Wall[] pathwayType = ca.Choose(options);
 
-        // place in node
-        maze[tarX, tarY].walls = pathwayType;
-        maze[tarX, tarY].visited = true;
-        // loop end
+                // R O T A T E pathway type
+                pathwayType = pathway.Rotate(pathwayType, (int)dir);
+        
+                // place in node
+                Node target = new Node(tarX, tarY, res.Item1);
+                target.walls = pathwayType;
+                target.visited = true;
+                maze[tarX, tarY] = target;
+
+                visitedGrid[tarX, tarY] = true;
+                curX = tarX;
+                curY = tarY;
+
+                // generate new nodes
+                for (int i = 0; i < 4; i++)
+                {
+                    int posNewX = tarX + modifier[2*i];
+                    int posNewY = tarY + modifier[2*i + 1];
+                    if (posNewX < 0 || posNewX >= size || posNewY < 0 || posNewY >= size) 
+                    {
+                        if (!maze[posNewX, posNewY].visited)//!movementOptions.Contains(maze[posNewX, posNewY]) && !maze[posNewX, posNewY]) 
+                        {
+                            movementOptions.Add(new Node(posNewX, posNewY, target));
+                        }   
+                    }
+                }
+            
+            // loop end
+            }
 
         // go to random unvisited location near walls next to a visited cell 
         
         // break open wall between prev cells
 
+        allVisited = visitedGrid.Cast<bool>().All(x => x == true);
+
         // loop end
+        }
     }
 }
 
@@ -83,12 +121,14 @@ public class PathAlgorithm
         size = size_;
     }
 
-    public (int, int, Direction) pathFind(int curX, int curY) 
+    public (Node, Direction) pathFind(int curX, int curY, List<Node> options) 
     {
         Random rng = new Random();
         int dir = rng.Next(4);
         int tarX = curX + modifier[2 * dir];
         int tarY = curY + modifier[2 * dir + 1];
+
+        Node next = options[rng.Next(options.Count)];
 
         while (tarX < 0 || tarX >= size || tarY < 0 || tarY >= size)
         {
@@ -97,7 +137,7 @@ public class PathAlgorithm
             tarY = curY + modifier[2 * dir + 1];
         }
 
-        return (tarX, tarY, (Direction)dir);
+        return (next, (Direction)dir);
     }
 }
 
@@ -121,8 +161,18 @@ public class ChooseAlgorithm
 
 public class Node
 {
+    public int x;
+    public int y;
     public Wall[] walls;
+    public Node prev;
     public bool visited = false;
+
+    public Node(int x_, int y_, Node prev_)
+    {
+        x = x_;
+        y = y_;
+        prev = prev_;
+    }
 
     public (string, string, string) Stringer()
     {
