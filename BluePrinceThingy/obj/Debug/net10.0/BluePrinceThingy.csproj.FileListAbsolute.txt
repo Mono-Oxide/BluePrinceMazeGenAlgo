@@ -12,3 +12,4 @@ C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\De
 C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\Debug\net10.0\BluePrinceThingy.pdb
 C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\Debug\net10.0\BluePrinceThingy.genruntimeconfig.cache
 C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\Debug\net10.0\ref\BluePrinceThingy.dll
+C:\Users\dvdb4\MAJOR_INFORMATICA_2025\Onderzoeksmethodes\BluePrinceThingy\obj\Debug\net10.0\BluePrinceThingy.sourcelink.json
