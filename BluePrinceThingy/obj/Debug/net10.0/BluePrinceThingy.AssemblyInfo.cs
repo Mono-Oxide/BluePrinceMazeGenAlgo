@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BluePrinceThingy")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+42b57aadfcfd6107985601a0b66ba4b211b47c50")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6d227419ebf82d36036875649fa7fda2513b21d1")]
 [assembly: System.Reflection.AssemblyProductAttribute("BluePrinceThingy")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BluePrinceThingy")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

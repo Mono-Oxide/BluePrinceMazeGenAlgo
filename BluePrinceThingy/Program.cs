@@ -5,15 +5,41 @@ using System.Drawing;
 using System.Linq.Expressions;
 using System.Linq;
 using System.Runtime;
+using System.Data;
+using System.ComponentModel.DataAnnotations;
 public class Program
 {
+    static List<int> intersectsList = new List<int>();
+    static List<int> deadendList = new List<int>(); 
+
     public static void Main()
     {
+        deadendList = new List<int>(); 
+        intersectsList = new List<int>();
+
+        for (int i = 0; i < 200; i++) {
         Visualizer vis = new Visualizer();
         MainAlgorithm ma = new MainAlgorithm();
-        Console.WriteLine("Starting now");
-        ma.Execute(5);
-        vis.Show(ma.maze);
+        Console.WriteLine("A new maze is now generating.");
+        ma.Execute(100);
+//        vis.Show(ma.maze);
+
+        int intersects = 0;
+        int deadends = 0;
+        foreach (Node node in ma.maze)
+        {
+            if (node.walls.Length < 2) intersects++;
+            if (node.walls.Length == 3) deadends++;
+        }
+
+            Console.WriteLine($"Maze {i+1}/1000 is completed - DE: {deadends}, I:{intersects}.");
+            intersectsList.Add(intersects);
+            deadendList.Add(deadends);
+        }
+
+        Console.WriteLine("Done!");
+
+        Console.WriteLine($"Avg DE: {deadendList.Average()}, Avg I: {intersectsList.Average()}");
     }
 }
 
@@ -30,6 +56,7 @@ public class MainAlgorithm
         PathAlgorithm pa = new PathAlgorithm(size);
         ChooseAlgorithm ca = new ChooseAlgorithm();
         HashSet<Node> movementOptions = new HashSet<Node>(); 
+        HashSet<Node> visited = new HashSet<Node>();
 
         int[] modifier = new int[8] {1, 0, 0, 1, -1, 0, 0, -1};
         Node nullNode = new Node(-1, -1, null);
@@ -63,31 +90,49 @@ public class MainAlgorithm
             // loop start
             while (movementOptions.Count > 0) {
                 // pick direction
-                (Node, Direction) res = pa.pathFind(curX, curY, movementOptions.ToList<Node>()); // random walk
-                movementOptions.Remove(res.Item1);
+                //(Node, Direction) res = pa.pathFind(curX, curY, movementOptions.ToList<Node>()); // random walk
+                Node res = pa.bfs(maze, maze[curX, curY]).ToList<Node>()[0];
+                movementOptions.Remove(res);
+
+                //var blih = pa.bfs(maze, maze[curX, curY]);
                 // (int, int, Direction) res = pa.pathFind(curX, curY); // bfs
 
-                tarX = res.Item1.x;
-                tarY = res.Item1.y;
-                Direction dir = res.Item2;
-                Console.WriteLine(dir);
+                tarX = res.x;
+                tarY = res.y;
+
+                Node next = res;
+                Node prev = next.prev;
+                Direction dir;
+                if (prev.x - next.x == 0)
+                {
+                    if (prev.y - next.y < 0) dir = (Direction)2; // DOWN
+                    else dir = (Direction)0;                     // UP
+                } else
+                {
+                    if (prev.x - next.x < 0) dir = (Direction)1; // LEFT
+                    else dir = (Direction)3;                     // RIGHT
+                }
+                
+                //Console.WriteLine(dir);
 
                 // get pathway options (poll)
                 Wall[][] options = pathway.Poll(curX, curY, size, (Wall)dir);
         
                 // choose one of the pathway types
+                //Wall[] pathwayType = ca.BChoose(options, visited);
                 Wall[] pathwayType = ca.Choose(options);
-                foreach (Wall w in pathwayType) Console.Write($"{w} ");
-                Console.WriteLine();
+                //foreach (Wall w in pathwayType) Console.Write($"{w} ");
+                //Console.WriteLine();
 
                 // R O T A T E pathway type
                 pathwayType = pathway.Rotate(pathwayType, (int)dir);
         
                 // place in node
-                Node target = new Node(tarX, tarY, res.Item1);
+                Node target = new Node(tarX, tarY, res);
                 target.walls = pathwayType;
                 target.visited = true;
                 maze[tarX, tarY] = target;
+                visited.Add(target);
 
                 visitedGrid[tarX, tarY] = true;
                 curX = tarX;
@@ -115,7 +160,6 @@ public class MainAlgorithm
     if (posNewX < 0 || posNewX >= size || posNewY < 0 || posNewY >= size)
         continue;
 
-    // 🚫 NEW: block if there's a wall in that direction
     if (maze[tarX, tarY].walls != null &&
         maze[tarX, tarY].walls.Contains((Wall)i))
         continue;
@@ -127,7 +171,7 @@ public class MainAlgorithm
 }
             Visualizer v = new Visualizer();
 
-            v.Show(maze);
+            //v.Show(maze);
 
             // loop end
             }
@@ -144,7 +188,10 @@ public class MainAlgorithm
                         {
                             int tempX = x + modifier[2*i];
                             int tempY = y + modifier[2*i+1];
-                            if (!visitedGrid[x, y]) unvisitedCells.Add((x, y));
+
+                            if (tempX < 0 || tempX >= size || tempY < 0 || tempY >= size) continue;
+
+                            if (!visitedGrid[tempX, tempY]) unvisitedCells.Add((tempX, tempY));
                         }
                     }
                 }
@@ -160,6 +207,10 @@ public class MainAlgorithm
             {
                 int tempX = newLoc.Item1 + modifier[2*i];
                 int tempY = newLoc.Item2 + modifier[2*i+1];
+
+                if (tempX < 0 || tempX >= size || tempY < 0 || tempY >= size) continue;
+
+
                 if (visitedGrid[tempX, tempY]) walledNeighbours.Add((tempX, tempY, i));
             }
             (int, int, int) wallToBreak = walledNeighbours[rng.Next(walledNeighbours.Count)];
@@ -263,6 +314,36 @@ public class ChooseAlgorithm
     public Wall[] Choose(Wall[][] options) 
     {
         return options[0];
+    }
+
+    public Wall[] BChoose(Wall[][] options, HashSet<Node> bleeh)
+    {
+        int amountOfOptions = 0;
+        foreach (Node node in bleeh)
+        {
+            if (node.walls.Length < 2)
+            {
+                amountOfOptions++;
+            }
+        }
+
+        List<int> pool = new List<int>();
+        for (int i = 0; i < 3; i++)
+        {
+            if (options[i].Length != 3)
+            {
+                for (int j = 0; j < amountOfOptions; j++) 
+                pool.Add(i);
+            } else pool.Add(i);
+        }
+
+        if (pool.Count <= 0)
+        {
+            return Choose(options);
+        }
+
+        Random rng = new Random();
+        return options[pool[rng.Next(pool.Count)]];
     }
 }
 
