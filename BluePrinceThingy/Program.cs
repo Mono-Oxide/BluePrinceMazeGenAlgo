@@ -91,8 +91,9 @@ public class MainAlgorithm
             while (movementOptions.Count > 0) {
                 // pick direction
                 //(Node, Direction) res = pa.pathFind(curX, curY, movementOptions.ToList<Node>()); // random walk
-                Node res = pa.bfs(maze, maze[curX, curY]).ToList<Node>()[0];
-                movementOptions.Remove(res);
+                // Node res = pa.bfs(maze, maze[curX, curY]).ToList<Node>()[0];
+                Node res = movementOptions[0];
+                movementOptions.RemoveAt(0);
 
                 //var blih = pa.bfs(maze, maze[curX, curY]);
                 // (int, int, Direction) res = pa.pathFind(curX, curY); // bfs
@@ -128,7 +129,7 @@ public class MainAlgorithm
                 pathwayType = pathway.Rotate(pathwayType, (int)dir);
         
                 // place in node
-                Node target = new Node(tarX, tarY, res);
+                Node target = new Node(tarX, tarY, prev);
                 target.walls = pathwayType;
                 target.visited = true;
                 maze[tarX, tarY] = target;
