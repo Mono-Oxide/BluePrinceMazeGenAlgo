@@ -92,8 +92,8 @@ public class MainAlgorithm
                 // pick direction
                 //(Node, Direction) res = pa.pathFind(curX, curY, movementOptions.ToList<Node>()); // random walk
                 // Node res = pa.bfs(maze, maze[curX, curY]).ToList<Node>()[0];
-                Node res = movementOptions[0];
-                movementOptions.RemoveAt(0);
+                Node res = movementOptions.ToList<Node>()[0];
+                movementOptions.Remove(res);
 
                 //var blih = pa.bfs(maze, maze[curX, curY]);
                 // (int, int, Direction) res = pa.pathFind(curX, curY); // bfs
