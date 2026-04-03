@@ -39,6 +39,11 @@ public class Program
 
         Console.WriteLine("Done!");
 
+        Agents agent = new Agents();
+        agent.maze = ma.maze;
+        int ranWalk = Agents.RandomWalk();
+        Console.WriteLine("RandomWalk solved in " + ranWalk + " steps");
+
         Console.WriteLine($"Avg DE: {deadendList.Average()}, Avg I: {intersectsList.Average()}");
     }
 }
@@ -402,6 +407,47 @@ public class Node
         }
 
         return res;
+    }
+}
+
+public class Agents
+{
+    public Node[,] maze;
+    
+    public int RandomWalk()
+    {
+        int i = 0;
+        Random rng = new Random();
+        int curX = rng.Next(0, maze.GetLength(0));
+        int curY = rng.Next(0, maze.GetLength(1));
+        int endX = rng.Next(0, maze.GetLength(0));
+        int endY = rng.Next(0, maze.GetLength(1));
+        while (curX != endX || curY != endY)
+        { 
+            i++;
+            Node curNode = maze[curX, curY];
+            List<Point> moves = new List<Point>();
+            for(int j = 0; j++ < 4; j++)
+            {
+                if(!curNode.walls.Contains((Wall)j))
+                    moves.Add(move(curX, curY, j));
+            }
+            int take = rng.Next(0, moves.GetLength());
+            curX = moves[take].X;
+            curY = moves[take].Y;
+        }
+        return i;
+        
+    }
+    private Point move(int startX, int startY, int dir)
+    {
+        switch (dir)
+        {
+            case 0:  return (new Point (startX, startY + 1));
+            case 1:  return (new Point (startX + 1, startY));
+            case 2:  return (new Point (startX, startY - 1));
+            default: return (new Point (startX - 1, start.Y));
+        };
     }
 }
 
