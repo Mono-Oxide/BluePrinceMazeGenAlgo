@@ -437,15 +437,21 @@ public class Agents
             if (moves.Count > 0) {
                 curX = moves[take].X;
                 curY = moves[take].Y;
-                Console.WriteLine($"Now at ({curX}, {curY})");
             }
             while (0 > curX || curX >= maze.GetLength(0) || 0 > curY || curY >= maze.GetLength(1))
             {
-                moves.RemoveAt(take);
-                take = rng.Next(0, moves.GetLength());
-                curX = moves[take].X;
-                curY = moves[take].Y;
+                if (moves.Count > 0) {
+                    moves.RemoveAt(take);
+                    take = rng.Next(0, moves.GetLength());
+                    curX = moves[take].X;
+                    curY = moves[take].Y;
+                }
+                else
+                    break;
             }
+            Console.WriteLine($"Now at ({curX}, {curY})");
+            if (i > 10000000)
+                break;
         }
         return i;
         
