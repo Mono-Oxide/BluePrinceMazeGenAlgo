@@ -456,8 +456,8 @@ public class Agents
                 break;
         }
         return i;
-        
     }
+
     public int DepthFirst()
     {
         int i = 0;
@@ -497,8 +497,64 @@ public class Agents
                 break;
         }
         return i;
-        
     }
+
+    public int DepthFirst()
+    {
+        int i = 0;
+        Random rng = new Random();
+        int curX = rng.Next(0, maze.GetLength(0));
+        int curY = rng.Next(0, maze.GetLength(1));
+        int endX = rng.Next(0, maze.GetLength(0));
+        int endY = rng.Next(0, maze.GetLength(1));
+        List<Node> expanded = new List<Node>();
+        List<Node> toExpand = new List<Node>();
+        while (curX != endX || curY != endY)
+        { 
+            i++;
+            Node curNode = maze[curX, curY];
+            expanded.Add(curNode);
+            List<Point> moves = new List<Point>();
+            for(int j = 0; j++ < 4; j++)
+            {
+                if(!curNode.walls.Contains((Wall)j))
+                    moves.Add(move(curX, curY, j));
+            }
+            foreach (Point move in moves)
+            {
+                if (0 > move.X || move.Y >= maze.GetLength(0) || 0 > move.X || move.Y >= maze.GetLength(1))
+                    continue;
+                Node toAdd = maze[move.X, move.Y];
+                if (!toExpand.Contains(toAdd) && !expanded.Contains(toAdd))
+                    toExpand.Add(toAdd);
+            }
+            if (toExpand.Count == 0)
+                break;
+            List<int> heuristicVals = new List<int>();
+            foreach (Node n in toExpand)
+            {
+                heuristicVals.Add(Math.Abs(n.x - endX) + Math.Abs(n.y - endY));
+            }
+            int smallest = 99999999;
+            int index = 0;
+            for (int i = 0; i++ < heuristicVals.Count; i++)
+            {
+                if (heuristicVals[i] < smallest)
+                {
+                    index = i;
+                    smallest = heuristicVals[i];
+                }
+            }
+            Node toExp = toExpand[index];
+            curX = toExp.x;
+            curY = toExp.y;
+            Console.WriteLine($"Now at ({curX}, {curY})");
+            if (i > 10000)
+                break;
+        }
+        return i;
+    }
+
     private Point move(int startX, int startY, int dir)
     {
         switch (dir)
