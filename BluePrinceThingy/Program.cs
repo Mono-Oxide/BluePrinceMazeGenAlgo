@@ -435,6 +435,13 @@ public class Agents
             int take = rng.Next(0, moves.GetLength());
             curX = moves[take].X;
             curY = moves[take].Y;
+            while (0 > curX || curX >= maze.GetLength(0) || 0 > curY || curY >= maze.GetLength(1))
+            {
+                moves.RemoveAt(take);
+                take = rng.Next(0, moves.GetLength());
+                curX = moves[take].X;
+                curY = moves[take].Y;
+            }
         }
         return i;
         
