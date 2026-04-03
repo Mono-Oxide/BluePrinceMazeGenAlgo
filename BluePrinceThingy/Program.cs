@@ -481,6 +481,8 @@ public class Agents
             }
             foreach (Point move in moves)
             {
+                if (0 > curX || curX >= maze.GetLength(0) || 0 > curY || curY >= maze.GetLength(1))
+                    continue;
                 Node toAdd = maze[move.X, move.Y];
                 if (!toExpand.Contains(toAdd) && !expanded.Contains(toAdd))
                     toExpand.Add(toAdd);
