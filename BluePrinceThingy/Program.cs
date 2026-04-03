@@ -16,13 +16,14 @@ public class Program
     {
         deadendList = new List<int>(); 
         intersectsList = new List<int>();
-
-        for (int i = 0; i < 200; i++) {
-        Visualizer vis = new Visualizer();
         MainAlgorithm ma = new MainAlgorithm();
+
+        for (int i = 0; i < 1; i++) {
+        Visualizer vis = new Visualizer();
+        ma = new MainAlgorithm();
         Console.WriteLine("A new maze is now generating.");
-        ma.Execute(100);
-//        vis.Show(ma.maze);
+        ma.Execute(8);
+        vis.Show(ma.maze);
 
         int intersects = 0;
         int deadends = 0;
@@ -41,7 +42,7 @@ public class Program
 
         Agents agent = new Agents();
         agent.maze = ma.maze;
-        int ranWalk = Agents.RandomWalk();
+        int ranWalk = agent.RandomWalk();
         Console.WriteLine("RandomWalk solved in " + ranWalk + " steps");
 
         Console.WriteLine($"Avg DE: {deadendList.Average()}, Avg I: {intersectsList.Average()}");
@@ -432,9 +433,12 @@ public class Agents
                 if(!curNode.walls.Contains((Wall)j))
                     moves.Add(move(curX, curY, j));
             }
-            int take = rng.Next(0, moves.GetLength());
-            curX = moves[take].X;
-            curY = moves[take].Y;
+            int take = rng.Next(0, moves.Count);
+            if (moves.Count > 0) {
+                curX = moves[take].X;
+                curY = moves[take].Y;
+                Console.WriteLine($"Now at ({curX}, {curY})");
+            }
             while (0 > curX || curX >= maze.GetLength(0) || 0 > curY || curY >= maze.GetLength(1))
             {
                 moves.RemoveAt(take);
@@ -453,7 +457,7 @@ public class Agents
             case 0:  return (new Point (startX, startY + 1));
             case 1:  return (new Point (startX + 1, startY));
             case 2:  return (new Point (startX, startY - 1));
-            default: return (new Point (startX - 1, start.Y));
+            default: return (new Point (startX - 1, startY));
         };
     }
 }
