@@ -437,8 +437,60 @@ public class Agents
             if (moves.Count > 0) {
                 curX = moves[take].X;
                 curY = moves[take].Y;
-                Console.WriteLine($"Now at ({curX}, {curY})");
             }
+            while (0 > curX || curX >= maze.GetLength(0) || 0 > curY || curY >= maze.GetLength(1))
+            {
+                if (moves.Count > 0) {
+                    moves.RemoveAt(take);
+                    take = rng.Next(0, moves.GetLength());
+                    curX = moves[take].X;
+                    curY = moves[take].Y;
+                }
+                else
+                    break;
+            }
+            Console.WriteLine($"Now at ({curX}, {curY})");
+            if (i > 10000000)
+                break;
+        }
+        return i;
+        
+    }
+    public int DepthFirst()
+    {
+        int i = 0;
+        Random rng = new Random();
+        int curX = rng.Next(0, maze.GetLength(0));
+        int curY = rng.Next(0, maze.GetLength(1));
+        int endX = rng.Next(0, maze.GetLength(0));
+        int endY = rng.Next(0, maze.GetLength(1));
+        List<Node> expanded = new List<Node>();
+        List<Node> toExpand = new List<Node>();
+        while (curX != endX || curY != endY)
+        { 
+            i++;
+            Node curNode = maze[curX, curY];
+            expanded.Add(curNode);
+            List<Point> moves = new List<Point>();
+            for(int j = 0; j++ < 4; j++)
+            {
+                if(!curNode.walls.Contains((Wall)j))
+                    moves.Add(move(curX, curY, j));
+            }
+            foreach (Point move in moves)
+            {
+                Node toAdd = maze[move.X, move.Y];
+                if (!toExpand.Contains(toAdd) && !expanded.Contains(toAdd))
+                    toExpand.Add(toAdd);
+            }
+            if (toExpand.Count == 0)
+                break;
+            Node toExp = toExpand[toExpand.Count - 1];
+            curX = toExp.x;
+            curY = toExp.y;
+            Console.WriteLine($"Now at ({curX}, {curY})");
+            if (i > 10000)
+                break;
         }
         return i;
         
