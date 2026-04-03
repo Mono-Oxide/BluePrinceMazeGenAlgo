@@ -42,8 +42,10 @@ public class Program
 
         Agents agent = new Agents();
         agent.maze = ma.maze;
-        int ranWalk = agent.RandomWalk();
-        Console.WriteLine("RandomWalk solved in " + ranWalk + " steps");
+        //int ranWalk = agent.RandomWalk();
+        int dfs = agent.DepthFirst();
+        //Console.WriteLine("RandomWalk solved in " + ranWalk + " steps");
+        Console.WriteLine("RandomWalk solved in " + dfs + " steps");
 
         Console.WriteLine($"Avg DE: {deadendList.Average()}, Avg I: {intersectsList.Average()}");
     }
@@ -442,7 +444,7 @@ public class Agents
             {
                 if (moves.Count > 0) {
                     moves.RemoveAt(take);
-                    take = rng.Next(0, moves.GetLength());
+                    take = rng.Next(0, moves.Count);
                     curX = moves[take].X;
                     curY = moves[take].Y;
                 }
